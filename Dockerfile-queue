@@ -1,0 +1,52 @@
+FROM dunglas/frankenphp:builder-php8.3.21
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    git \
+    unzip \
+    librabbitmq-dev \
+    libpq-dev \
+    nano \
+    supervisor
+
+RUN install-php-extensions \
+    gd \
+    pcntl \
+    opcache \
+    pdo \
+    pdo_mysql \
+    zip \
+    redis
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=oven/bun:latest /usr/local/bin/bun /usr/local/bin/bun
+
+WORKDIR /var/www/html
+
+# Copy the Laravel application files into the container.
+COPY . .
+
+# Start with base PHP config, then add extensions.
+COPY ./deploy/php.ini /usr/local/etc/php/
+
+# Install Laravel dependencies using Composer.
+RUN composer install --optimize-autoloader --no-dev
+
+COPY package.json ./
+COPY bun.lock ./
+
+# Build frontend assets
+RUN bun install
+RUN bun run build
+
+# Laravel artisan commands
+RUN php artisan storage:link && php artisan optimize
+
+# Set permissions for the application
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+ENV FRANKENPHP_THREADS=8
+ENV OP_CACHE_ENABLE=1
+
+# Start the queue worker
+CMD ["php", "artisan", "queue:work", "--tries=3", "--timeout=90"]

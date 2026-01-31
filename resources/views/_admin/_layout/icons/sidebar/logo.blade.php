@@ -1,0 +1,2 @@
+<img src="{{ asset('assets/logo/smart-sekolah.png') }}" alt="Logo" style="height: 2.5rem; max-height: 2.5rem; width: auto;" class="h-8 max-h-8 md:h-10 md:max-h-10 w-auto dark:hidden">
+<img src="{{ asset('assets/logo/smart-sekolah-dark.png') }}" alt="Logo" style="height: 2.5rem; max-height: 2.5rem; width: auto;" class="h-8 max-h-8 md:h-10 md:max-h-10 w-auto hidden dark:block">
