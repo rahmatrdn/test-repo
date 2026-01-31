@@ -37,7 +37,8 @@ COPY ./deploy/php.ini /usr/local/etc/php/
 # RUN pecl install xdebug
 
 # Install Laravel dependencies using Composer.
-RUN composer install --optimize-autoloader --no-dev
+# RUN composer install --optimize-autoloader --no-dev
+RUN composer install --optimize-autoloader --no-dev --no-scripts
 
 COPY package.json ./
 COPY bun.lock ./
