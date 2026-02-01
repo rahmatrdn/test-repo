@@ -33,7 +33,7 @@ class UserController extends Controller
         ]);
         $data = $data['data']['list'] ?? [];
 
-        return view('_admin.users.index', [
+        return view('_admin.users.index ', [
             'data' => $data,
             'page' => $this->page,
             'keywords' => $request->get('keywords'),
@@ -142,7 +142,7 @@ class UserController extends Controller
         if ($resetProcess['success']) {
             return redirect()
                 ->route('admin.users.index')
-                ->with('success', 'Password berhasil direset menjadi default');
+                ->with('success', ResponseConst::SUCCESS_MESSAGE_RESET_PASSWORD);
         } else {
             return redirect()
                 ->route('admin.users.index')

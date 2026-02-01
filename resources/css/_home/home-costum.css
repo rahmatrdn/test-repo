@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  scroll-behavior: smooth;
+}
+
+@theme {
+  --font-poppins: "Poppins", Arial, Helvetica, sans-serif;
+  --font-fredoka: "Fredoka", cursive, Arial, Helvetica, sans-serif;
+  --color-lightBg: #f8fafc;
+  --color-primary: #2563eb;
+  /* blue-600 */
+  --color-secondary: #1d4ed8;
+  /* blue-700 */
+  --color-darkBg: #0f172a;
+}
+
+a,
+button {
+  @apply cursor-pointer;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.transition-all-300 {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 20px;
+}
+
+body {
+  @apply overflow-x-hidden font-poppins;
+}
+
+#mobile-menu {
+  @apply fixed transition duration-700 translate-x-[100%] left-0 right-0 top-18.5 z-40 border-b border-slate-200 dark:border-slate-800 flex h-fit py-10 flex-col items-center justify-center gap-8 text-base font-semibold min-[1000px]:hidden;
+}
+
+#mobile-menu.active {
+  @apply translate-x-0;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  @apply text-primary;
+}
+
+.hamburger-navbar {
+  @apply min-[1000px]:hidden cursor-pointer relative w-6 h-5 min-[470px]:h-6 min-[470px]:w-7 flex items-center justify-center flex-col;
+}
+
+.hamburger-navbar span {
+  @apply w-7 h-[3px] bg-black block rounded-full absolute transition duration-300;
+}
+
+.hamburger-navbar span:nth-child(1) {
+  transform-origin: top left;
+  top: 0;
+}
+
+.hamburger-navbar span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+}
+
+.hamburger-navbar span:nth-child(3) {
+  transform-origin: bottom left;
+  bottom: 0;
+}
+
+.hamburger-navbar.active span:nth-child(1) {
+  /* transform: rotate(52deg); */
+  @apply rotate-41 min-[440px]:rotate-52;
+}
+
+.hamburger-navbar.active span:nth-child(2) {
+  transform: translateY(-50%) scale(0);
+}
+
+.hamburger-navbar.active span:nth-child(3) {
+  /* transform: rotate(-52deg); */
+  @apply -rotate-41 min-[440px]:-rotate-52;
+}
+
+/* Custom Scrollbar for the dropdown */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* Dropdown animation */
+.dropdown-menu {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-menu.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Constants\ResponseConst;
 use App\Constants\TaskStatusConst;
 use App\Http\Controllers\Controller;
-use App\Usecase\TaskCategoryUsecase;
-use App\Usecase\TaskUsecase;
+use App\Usecase\Admin\TaskCategoryUsecase;
+use App\Usecase\Admin\TaskUsecase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ class TaskController extends Controller
 {
     protected array $page = [
         'route' => 'tasks',
-        'title' => 'Manajemen Tugas',
+        'title' => 'Penugasan',
     ];
 
     protected string $baseRedirect;
@@ -71,7 +71,7 @@ class TaskController extends Controller
 
         if ($process['success']) {
             return redirect()
-                ->route('admin.tasks.index')
+                ->route('teacher.tasks.index')
                 ->with('success', ResponseConst::SUCCESS_MESSAGE_CREATED);
         } else {
             return redirect()
@@ -113,7 +113,7 @@ class TaskController extends Controller
 
         if ($process['success']) {
             return redirect()
-                ->route('admin.tasks.index')
+                ->route('teacher.tasks.index')
                 ->with('success', ResponseConst::SUCCESS_MESSAGE_UPDATED);
         } else {
             return redirect()
@@ -129,11 +129,11 @@ class TaskController extends Controller
 
         if ($process['success']) {
             return redirect()
-                ->route('admin.tasks.index')
+                ->route('teacher.tasks.index')
                 ->with('success', ResponseConst::SUCCESS_MESSAGE_DELETED);
         } else {
             return redirect()
-                ->route('admin.tasks.index')
+                ->route('teacher.tasks.index')
                 ->with('error', $process['message'] ?? ResponseConst::DEFAULT_ERROR_MESSAGE);
         }
     }

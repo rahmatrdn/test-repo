@@ -22,6 +22,12 @@ class ResponseConst
 
     const SUCCESS_MESSAGE_DELETED = 'Data berhasil dihapus';
 
+    const SUCCESS_MESSAGE_RESTORED = 'Data berhasil dipulihkan';
+
+    const SUCCESS_MESSAGE_DELETED_SCHOOLS = 'Data sekolah berhasil dihapus';
+
+    const SUCCESS_MESSAGE_RESET_PASSWORD = 'Password berhasil direset';
+
     const SUCCESS_MESSAGE_CREATED = 'Data berhasil dibuat';
 
     const ERROR_MESSAGE_NOT_FOUND = 'Data tidak ditemukan';
