@@ -23,16 +23,41 @@ textarea {
     border: 1px solid oklch(.928 .006 264.531) !important;
 }
 
+/* Dark mode border colors */
 .dark input:where([type="text"], [type="email"], [type="password"], [type="number"], [type="tel"], [type="url"], [type="search"], [type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]),
 .dark select,
 .dark textarea {
     border-color: oklch(.371 0 0) !important;
 }
 
-button {
-    cursor: pointer;
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-body {
-  scrollbar-gutter: stable;
+::-webkit-scrollbar-track {
+    background: oklch(.95 0 0);
+}
+
+::-webkit-scrollbar-thumb {
+    background: oklch(.7 0 0);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: oklch(.6 0 0);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+    background: oklch(.2 0 0);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: oklch(.4 0 0);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: oklch(.5 0 0);
 }

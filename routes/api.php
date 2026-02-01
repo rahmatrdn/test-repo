@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Teacher\AITools\SummarizeDocController;
-use App\Http\Controllers\Teacher\ToolsController;
+use App\Http\Controllers\GenerateTextController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,13 +10,6 @@ Route::get('/user', function (Request $request) {
 
 //AI Tools
 Route::prefix('tools')->group(function () {
-    Route::post('/ilustration', [ToolsController::class, 'doCreate'])->name('create_ilustration');
-    Route::post('/materi', [ToolsController::class, 'doCreateMateri'])->name('create_materi');
-    Route::post('/quiz', [ToolsController::class, 'doCreateQuiz'])->name('create_quiz');
-    Route::post('document/summarize', [SummarizeDocController::class, 'summarizeAsync'])->name('document_summarize_async');
-});
-
-Route::prefix('status')->group(function () {
-    Route::get('/text/{referenceId}', [ToolsController::class, 'JobTextStatus'])->name('job_status_text');
-    Route::get('/ilustration/{referenceId}', [ToolsController::class, 'JobImageStatus'])->name('job_status_image');
+    Route::post('/generate-text', [GenerateTextController::class, 'generate'])->name('generate_text');
+    Route::get('/status/{referenceId}', [GenerateTextController::class, 'status'])->name('generate_text_status');
 });

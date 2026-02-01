@@ -9,38 +9,32 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class UserUsecase extends Usecase
+class TaskCategoryUsecase extends Usecase
 {
-    private const DEFAULT_PASSWORD = 'default';
-
     public function __construct() {}
 
     public function getAll(array $filterData = []): array
     {
         try {
-            $data = DB::table(DatabaseConst::USER)
+            $query = DB::table(DatabaseConst::TASK_CATEGORY)
                 ->whereNull('deleted_at')
                 ->when($filterData['keywords'] ?? false, function ($query, $keywords) {
-                    return $query->where(function ($q) use ($keywords) {
-                        $q->where('name', 'like', '%'.$keywords.'%')
-                            ->orWhere('email', 'like', '%'.$keywords.'%');
-                    });
+                    return $query->where('name', 'like', '%'.$keywords.'%');
                 })
-                ->when($filterData['access_type'] ?? false, function ($query, $accessType) {
-                    if ($accessType !== 'all') {
-                        return $query->where('access_type', $accessType);
-                    }
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
+                ->orderBy('created_at', 'desc');
 
-            // Append filter parameters to pagination links
-            if (! empty($filterData)) {
-                $data->appends($filterData);
+            if (! empty($filterData['no_pagination'])) {
+                $data = $query->get();
+            } else {
+                $data = $query->paginate(20);
+
+                // Append filter parameters to pagination links
+                if (! empty($filterData)) {
+                    $data->appends($filterData);
+                }
             }
 
             return Response::buildSuccess(
@@ -64,7 +58,7 @@ class UserUsecase extends Usecase
     public function getByID(int $id): array
     {
         try {
-            $data = DB::table(DatabaseConst::USER)
+            $data = DB::table(DatabaseConst::TASK_CATEGORY)
                 ->whereNull('deleted_at')
                 ->where('id', $id)
                 ->first();
@@ -88,21 +82,15 @@ class UserUsecase extends Usecase
     {
         $validator = Validator::make($data->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'access_type' => 'required',
         ]);
 
         $validator->validate();
 
         DB::beginTransaction();
         try {
-            DB::table(DatabaseConst::USER)
+            DB::table(DatabaseConst::TASK_CATEGORY)
                 ->insert([
                     'name' => $data['name'],
-                    'email' => $data['email'],
-                    'access_type' => $data['access_type'],
-                    'password' => Hash::make(self::DEFAULT_PASSWORD),
-                    'is_active' => 1,
                     'created_by' => Auth::user()?->id,
                     'created_at' => now(),
                 ]);
@@ -127,16 +115,13 @@ class UserUsecase extends Usecase
     public function update(Request $data, int $id): array|Exception
     {
         $validator = Validator::make($data->all(), [
-            'name' => 'required|min:4',
-            'email' => 'required|email',
+            'name' => 'required',
         ]);
 
         $validator->validate();
 
         $update = [
             'name' => $data['name'],
-            'email' => $data['email'],
-            'access_type' => $data['access_type'],
             'updated_by' => Auth::user()?->id,
             'updated_at' => now(),
         ];
@@ -144,7 +129,7 @@ class UserUsecase extends Usecase
         DB::beginTransaction();
 
         try {
-            DB::table(DatabaseConst::USER)
+            DB::table(DatabaseConst::TASK_CATEGORY)
                 ->where('id', $id)
                 ->update($update);
 
@@ -172,7 +157,7 @@ class UserUsecase extends Usecase
         DB::beginTransaction();
 
         try {
-            $delete = DB::table(DatabaseConst::USER)
+            $delete = DB::table(DatabaseConst::TASK_CATEGORY)
                 ->where('id', $id)
                 ->update([
                     'deleted_by' => Auth::user()?->id,
@@ -188,98 +173,6 @@ class UserUsecase extends Usecase
 
             return Response::buildSuccess(
                 message: ResponseConst::SUCCESS_MESSAGE_DELETED
-            );
-        } catch (Exception $e) {
-            DB::rollback();
-
-            Log::error(
-                message: $e->getMessage(),
-                context: [
-                    'method' => __METHOD__,
-                ]
-            );
-
-            return Response::buildErrorService($e->getMessage());
-        }
-    }
-
-    public function changePassword(array $data): array
-    {
-        $userID = Auth::user()?->id;
-
-        $validator = Validator::make($data, [
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', 'min:6', 'different:current_password'],
-        ]);
-
-        $customAttributes = [
-            'current_password' => 'Password Lama',
-            'password' => 'Password Baru',
-        ];
-        $validator->setAttributeNames($customAttributes);
-        $validator->validate();
-
-        DB::beginTransaction();
-
-        try {
-            $locked = DB::table(DatabaseConst::USER)
-                ->where('id', $userID)
-                ->whereNull('deleted_at')
-                ->lockForUpdate()
-                ->first(['id']);
-
-            if (! $locked) {
-                DB::rollback();
-
-                throw new Exception('FAILED LOCKED DATA');
-            }
-
-            DB::table(DatabaseConst::USER)
-                ->where('id', $userID)
-                ->update([
-                    'password' => Hash::make($data['password']),
-                    'updated_by' => $userID,
-                    'updated_at' => now(),
-                ]);
-
-            DB::commit();
-
-            return Response::buildSuccess(
-                message: ResponseConst::SUCCESS_MESSAGE_UPDATED
-            );
-        } catch (Exception $e) {
-            DB::rollback();
-
-            Log::error(
-                message: $e->getMessage(),
-                context: [
-                    'method' => __METHOD__,
-                ]
-            );
-
-            return Response::buildErrorService($e->getMessage());
-        }
-    }
-
-    public function resetPassword(int $id): array
-    {
-        $defaultPassword = self::DEFAULT_PASSWORD;
-
-        DB::beginTransaction();
-
-        try {
-            DB::table(DatabaseConst::USER)
-                ->where('id', $id)
-                ->update([
-                    'password' => Hash::make($defaultPassword),
-                    'updated_by' => Auth::user()?->id,
-                    'updated_at' => now(),
-                ]);
-
-            DB::commit();
-
-            return Response::buildSuccess(
-                message: 'Password berhasil direset'
             );
         } catch (Exception $e) {
             DB::rollback();
