@@ -36,6 +36,8 @@ class RunImageGeneration implements ShouldQueue
                 modelId: $this->imageStyleId,
             );
 
+            dump($result);
+
             if (($result['code'] ?? null) !== 200) {
                 if (Storage::disk('public')->exists("generated-images/{$this->referenceId}.png")) {
                     Log::warning('Job marked failed but image exists', [
